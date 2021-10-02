@@ -12,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.cos.newsapp.domain.NaverNews;
 import com.cos.newsapp.domain.NaverNewsRepository;
-import com.sun.tools.javap.TryBlockWriter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,15 +28,16 @@ public class NaverNewsCrawBatch {
 		
 		// 벌크 컬렉터로 for문 돌때마다 저장하지 않고 한꺼번에 저장, class타입으로 데이터 세가지 담을 수 있게 NaverNews 모델 만들어준다.
 		List<NaverNews> newsList = new ArrayList<>();
-		
 		for (int i = 0; i < 5; i++) {
-			String aidStr = String.format("%010d", aid);
-			String url = "https://news.naver.com/main/read.naver?mode=LSD&mid=shm&sid1=102&oid=022&aid=" + aidStr;
+			
+			try{
+				String aidStr = String.format("%010d", aid);
+				String url = "https://news.naver.com/main/read.naver?mode=LSD&mid=shm&sid1=102&oid=022&aid=" + aidStr;
+				
+				RestTemplate rt = new RestTemplate(); // 안드로이드 : Retrofit2(내부 쓰레드)
 
-			RestTemplate rt = new RestTemplate(); // 안드로이드 : Retrofit2(내부 쓰레드)
-
-			try {
 				String html = rt.getForObject(url, String.class); // String.class 응답받은 타입
+				
 				Document doc = Jsoup.parse(html);
 				
 				Element companyElement = doc.selectFirst(".press_logo img");
@@ -63,10 +63,13 @@ public class NaverNewsCrawBatch {
 				newsList.add(nn);
 				
 			} catch (Exception e) {
-				System.out.println("통신 오류!!");
-			} // end of try~ catch
+				System.out.println("통신오류!!");
+			}
+
 			aid++;
+			
 		} // end of for
+		
 		naverNewsRepository.saveAll(newsList); // 벌크 컬렉터  : 한번에 저장 -> 엄청 빠르다. 
 		
 		/*
