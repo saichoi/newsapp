@@ -37,8 +37,8 @@ public class NaverCrawTest {
 		Document doc = Jsoup.parse(html);
 		
 		Element companyElement = doc.selectFirst(".press_logo img");
-		String companyAttr = companyElement.attr("title");
-		System.out.println(companyAttr);
+		String company = companyElement.attr("title");
+		System.out.println(company);
 		
 		Element titleElement = doc.selectFirst("#articleTitle");
 		String title = titleElement.text();
